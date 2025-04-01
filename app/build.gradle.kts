@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("kotlin-parcelize")
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.21"
 }
 
 android {
@@ -65,6 +66,11 @@ dependencies {
 
     implementation(libs.androidx.material.icons.extended)
 
+    // DataStore for preferences
+    implementation(libs.androidx.datastore.preferences)
+    
+    // Kotlinx Serialization
+    implementation(libs.kotlinx.serialization.json)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)

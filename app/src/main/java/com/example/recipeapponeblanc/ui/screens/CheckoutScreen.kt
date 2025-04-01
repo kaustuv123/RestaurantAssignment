@@ -54,6 +54,7 @@ import com.example.recipeapponeblanc.viewmodel.CartViewModel
 fun CheckoutScreen(
     onBackClick: () -> Unit,
     cartViewModel: CartViewModel,
+    onOrderPlaced: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val cartState by cartViewModel.cartState.collectAsStateWithLifecycle()
@@ -80,7 +81,10 @@ fun CheckoutScreen(
                 shadowElevation = 8.dp
             ) {
                 Button(
-                    onClick = { /* Will be implemented in future */ },
+                    onClick = {
+                        // Trigger order placement
+                        onOrderPlaced()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
@@ -88,7 +92,8 @@ fun CheckoutScreen(
                         containerColor = brownColor,
                         contentColor = Color.White
                     ),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    enabled = cartState.items.isNotEmpty()
                 ) {
                     Text(
                         text = "Place Order",

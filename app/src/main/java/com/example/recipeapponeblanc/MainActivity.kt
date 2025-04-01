@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -38,6 +39,7 @@ import com.example.recipeapponeblanc.ui.screens.DishListScreen
 import com.example.recipeapponeblanc.ui.screens.HomeScreen
 import com.example.recipeapponeblanc.ui.theme.RecipeAppOneblancTheme
 import com.example.recipeapponeblanc.viewmodel.CartViewModel
+import com.example.recipeapponeblanc.viewmodel.OrderViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,6 +58,12 @@ fun RecipeApp(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     val cartViewModel: CartViewModel = viewModel()
     val cartState by cartViewModel.cartState.collectAsState()
+    
+    // Create OrderViewModel
+    val context = LocalContext.current
+    val orderViewModel: OrderViewModel = viewModel(
+        factory = OrderViewModel.Factory(context.applicationContext as android.app.Application)
+    )
     
     // Check current route to determine if we should show the bottom bar
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -111,7 +119,8 @@ fun RecipeApp(modifier: Modifier = Modifier) {
                         navController.navigate("dish_list/${cuisine.cuisine_id}") {
                             launchSingleTop = true
                         }
-                    }
+                    },
+                    orderViewModel = orderViewModel
                 )
             }
             
@@ -149,7 +158,19 @@ fun RecipeApp(modifier: Modifier = Modifier) {
                     onBackClick = {
                         navController.popBackStack()
                     },
-                    cartViewModel = cartViewModel
+                    cartViewModel = cartViewModel,
+                    onOrderPlaced = {
+                        // Place the order
+                        orderViewModel.placeOrder(cartState) {
+                            // Clear the cart
+                            cartViewModel.clearCart()
+                            
+                            // Navigate back to home
+                            navController.navigate("home") {
+                                popUpTo("home") { inclusive = true }
+                            }
+                        }
+                    }
                 )
             }
         }
