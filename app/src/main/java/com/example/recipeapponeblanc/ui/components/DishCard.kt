@@ -50,13 +50,17 @@ fun DishCard(
     modifier: Modifier = Modifier
 ) {
     val brownColor = Color(0xFF8B4513)
+    val lightBrownColor = Color(0xFFE2C4AC) // Light brown color
     
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = lightBrownColor
+        )
     ) {
         Column {
             // Dish Image
