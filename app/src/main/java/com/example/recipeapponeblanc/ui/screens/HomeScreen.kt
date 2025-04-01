@@ -21,12 +21,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.recipeapponeblanc.data.model.Cuisine
-import com.example.recipeapponeblanc.data.model.DishItem
 import com.example.recipeapponeblanc.data.model.Order
 import com.example.recipeapponeblanc.data.model.OrderItem
 import com.example.recipeapponeblanc.ui.components.CuisineCard
@@ -40,10 +38,10 @@ fun HomeScreen(
     onCuisineClick: (Cuisine) -> Unit,
     orderViewModel: OrderViewModel,
     modifier: Modifier = Modifier,
-    viewModel: CuisineViewModel = viewModel(),
+    cuisineViewModel: CuisineViewModel = viewModel(),
     cartViewModel: CartViewModel = viewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by cuisineViewModel.uiState.collectAsStateWithLifecycle()
     val orderHistory by orderViewModel.orderHistory.collectAsStateWithLifecycle()
     val cartState by cartViewModel.cartState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -66,7 +64,7 @@ fun HomeScreen(
                     
                     // Load more when user reaches near the end (3 items before the end)
                     if (lastVisibleIndex >= uiState.cuisines.size - 3 && !uiState.isLoading && uiState.hasMoreData) {
-                        viewModel.loadCuisines()
+                        cuisineViewModel.loadCuisines()
                     }
                 }
             }
@@ -91,7 +89,7 @@ fun HomeScreen(
         item {
             if (uiState.cuisines.isEmpty() && !uiState.isLoading) {
                 EmptyState(
-                    onRetry = { viewModel.retryLoading() },
+                    onRetry = { cuisineViewModel.retryLoading() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
@@ -163,9 +161,7 @@ fun HomeScreen(
                 }
             } else {
                 LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(250.dp),
+                    modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -178,8 +174,7 @@ fun HomeScreen(
                                 onAddToCart = { cartViewModel.addToCart(dish) },
                                 onRemoveFromCart = { cartViewModel.removeFromCart(dish.id) },
                                 modifier = Modifier
-                                    .width(200.dp)
-                                    .height(250.dp)
+                                    .width(280.dp)
                             )
                         }
                     }
