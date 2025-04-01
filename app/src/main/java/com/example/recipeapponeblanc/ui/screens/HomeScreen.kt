@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,9 +26,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.recipeapponeblanc.data.model.Cuisine
+import com.example.recipeapponeblanc.data.model.DishItem
 import com.example.recipeapponeblanc.data.model.Order
 import com.example.recipeapponeblanc.data.model.OrderItem
 import com.example.recipeapponeblanc.ui.components.CuisineCard
+import com.example.recipeapponeblanc.ui.components.DishCard
+import com.example.recipeapponeblanc.viewmodel.CartViewModel
 import com.example.recipeapponeblanc.viewmodel.CuisineViewModel
 import com.example.recipeapponeblanc.viewmodel.OrderViewModel
 
@@ -36,10 +40,12 @@ fun HomeScreen(
     onCuisineClick: (Cuisine) -> Unit,
     orderViewModel: OrderViewModel,
     modifier: Modifier = Modifier,
-    viewModel: CuisineViewModel = viewModel()
+    viewModel: CuisineViewModel = viewModel(),
+    cartViewModel: CartViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val orderHistory by orderViewModel.orderHistory.collectAsStateWithLifecycle()
+    val cartState by cartViewModel.cartState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val listState = rememberLazyListState()
     
@@ -131,6 +137,56 @@ fun HomeScreen(
             }
         }
         
+        // Bestseller section
+        item {
+            Text(
+                text = "Bestsellers",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+            )
+        }
+        
+        item {
+            if (uiState.cuisines.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(250.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Loading bestsellers...",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                }
+            } else {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(250.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(uiState.cuisines) { cuisine ->
+                        cuisine.items.firstOrNull()?.let { dish ->
+                            val quantity = cartState.items[dish.id]?.quantity ?: 0
+                            DishCard(
+                                dish = dish,
+                                quantity = quantity,
+                                onAddToCart = { cartViewModel.addToCart(dish) },
+                                onRemoveFromCart = { cartViewModel.removeFromCart(dish.id) },
+                                modifier = Modifier
+                                    .width(200.dp)
+                                    .height(250.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        
         // Order history section
         item {
             Text(
@@ -163,10 +219,7 @@ fun HomeScreen(
                     contentPadding = PaddingValues(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(
-                        items = orderHistory,
-                        key = { it.id }
-                    ) { order ->
+                    items(orderHistory) { order ->
                         OrderCard(
                             order = order,
                             modifier = Modifier
