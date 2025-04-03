@@ -120,7 +120,8 @@ fun RecipeApp(modifier: Modifier = Modifier) {
                             launchSingleTop = true
                         }
                     },
-                    orderViewModel = orderViewModel
+                    orderViewModel = orderViewModel,
+                    cartViewModel = cartViewModel
                 )
             }
             

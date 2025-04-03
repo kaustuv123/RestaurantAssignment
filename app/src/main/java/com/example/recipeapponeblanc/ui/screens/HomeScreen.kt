@@ -37,9 +37,9 @@ import com.example.recipeapponeblanc.viewmodel.OrderViewModel
 fun HomeScreen(
     onCuisineClick: (Cuisine) -> Unit,
     orderViewModel: OrderViewModel,
+    cartViewModel: CartViewModel,
     modifier: Modifier = Modifier,
-    cuisineViewModel: CuisineViewModel = viewModel(),
-    cartViewModel: CartViewModel = viewModel()
+    cuisineViewModel: CuisineViewModel = viewModel()
 ) {
     val uiState by cuisineViewModel.uiState.collectAsStateWithLifecycle()
     val orderHistory by orderViewModel.orderHistory.collectAsStateWithLifecycle()
